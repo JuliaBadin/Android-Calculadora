@@ -1,220 +1,172 @@
 package exemplos.calculadora;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
 import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
-public class MainActivity extends AppCompatActivity {
+import androidx.appcompat.app.AppCompatActivity;
 
-    Integer num1 = -1, num2 = -1, resultado = 0;
-    char op = ' ';
-    boolean semMaisNumeros = false;
-    Button bt0, bt1, bt2, bt3, bt4, bt5, bt6, bt7, bt8, bt9, btsoma, btsubtrai, btmultiplica, btdivide, btresultado, btclear;
-    TextView tvresultado, tvnumeros;
+//biblioteca para expressões matemáticas
+import net.objecthunter.exp4j.Expression;
+import net.objecthunter.exp4j.ExpressionBuilder;
+
+public class MainActivity extends AppCompatActivity implements View.OnClickListener{
+
+    Button bt0, bt1, bt2, bt3, bt4, bt5, bt6, bt7, bt8, bt9, btsoma, btsubtrai, btmultiplica, btdivide, btresultado, btclear, btponto;
+    TextView tvresultado, tvexpressao;
+    ImageView backspace;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        initVariaveis();
+        inicial(); //pega o id dos elementos do xml
 
+        //define eventos de onclick
+        bt0.setOnClickListener(this);
+        bt1.setOnClickListener(this);
+        bt2.setOnClickListener(this);
+        bt3.setOnClickListener(this);
+        bt4.setOnClickListener(this);
+        bt5.setOnClickListener(this);
+        bt6.setOnClickListener(this);
+        bt7.setOnClickListener(this);
+        bt8.setOnClickListener(this);
+        bt9.setOnClickListener(this);
+        btsoma.setOnClickListener(this);
+        btdivide.setOnClickListener(this);
+        btsubtrai.setOnClickListener(this);
+        btmultiplica.setOnClickListener(this);
+        btponto.setOnClickListener(this);
+        btclear.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                tvresultado.setText("");
+                tvexpressao.setText("");
+            }
+        });
+        backspace.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String valor = tvexpressao.getText().toString();
 
-        OnClickListener ListenerB0 = new OnClickListener() {
-            public void onClick(View v) {
-                NumeroPressionado(0);
-            }
-        };
-        OnClickListener ListenerB1 = new OnClickListener() {
-            public void onClick(View v) {
-                NumeroPressionado(1);
-            }
-        };
-        OnClickListener ListenerB2 = new OnClickListener() {
-            public void onClick(View v) {
-                NumeroPressionado(2);
-            }
-        };
-        OnClickListener ListenerB3 = new OnClickListener() {
-            public void onClick(View v) {
-                NumeroPressionado(3);
-            }
-        };
-        OnClickListener ListenerB4 = new OnClickListener() {
-            public void onClick(View v) {
-                NumeroPressionado(4);
-            }
-        };
-        OnClickListener ListenerB5 = new OnClickListener() {
-            public void onClick(View v) {
-                NumeroPressionado(5);
-            }
-        };
-        OnClickListener ListenerB6 = new OnClickListener() {
-            public void onClick(View v) {
-                NumeroPressionado(6);
-            }
-        };
-        OnClickListener ListenerB7 = new OnClickListener() {
-            public void onClick(View v) {
-                NumeroPressionado(7);
-            }
-        };
-        OnClickListener ListenerB8 = new OnClickListener() {
-            public void onClick(View v) {
-                NumeroPressionado(8);
-            }
-        };
-        OnClickListener ListenerB9 = new OnClickListener() {
-            public void onClick(View v) {
-                NumeroPressionado(9);
-            }
-        };
-        OnClickListener ListenerBSoma = new OnClickListener() {
-            public void onClick(View v) {
-                OperadorPressionado("+");
-            }
-        };
-        OnClickListener ListenerBSubtrai = new OnClickListener() {
-            public void onClick(View v) {
-                OperadorPressionado("-");
-            }
-        };
-        OnClickListener ListenerBMultiplica = new OnClickListener() {
-            public void onClick(View v) {
-                OperadorPressionado("*");
-            }
-        };
-        OnClickListener ListenerBDivide = new OnClickListener() {
-            public void onClick(View v) {
-                OperadorPressionado("/");
-            }
-        };
-        OnClickListener ListenerBClear = new OnClickListener() {
-            public void onClick(View v) {
-                LimparTudo();
-            }
-        };
-        OnClickListener ListenerBResultado = new OnClickListener() {
-            public void onClick(View v) {
-                if (num1 != -1 && num2 != -1) {
-                    switch (op) {
-                        case ('+'):
-                            resultado = num1 + num2;
-                            MostrarResultado();
-                            break;
-                        case ('-'):
-                            resultado = num1 - num2;
-                            MostrarResultado();
-                            break;
-                        case ('*'):
-                            resultado = num1 * num2;
-                            MostrarResultado();
-                            break;
-                        case ('/'):
-                            resultado = num1 / num2;
-                            MostrarResultado();
-                            break;
-                    }
+                if(!valor.isEmpty()) {
+                    int var = valor.length() - 1;
+                    String exp = valor.substring(0, var); //tira o ultimo digito da expressao
+                    tvexpressao.setText(exp); //redefine a string
                 }
-                num1 = resultado;
-                num2 = -1;
-                op = ' ';
-                semMaisNumeros = false;
+                tvresultado.setText("");
             }
-        };
+        });
+        btresultado.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+                try {
+                    Expression exp = new ExpressionBuilder(tvexpressao.getText().toString()).build(); //pega tudo que foi clicado e monta a expressão
+                    double res = exp.evaluate(); //dá o resultado
+                    long longResult = (long) res;
 
-        bt0.setOnClickListener(ListenerB0);
-        bt1.setOnClickListener(ListenerB1);
-        bt2.setOnClickListener(ListenerB2);
-        bt3.setOnClickListener(ListenerB3);
-        bt4.setOnClickListener(ListenerB4);
-        bt5.setOnClickListener(ListenerB5);
-        bt6.setOnClickListener(ListenerB6);
-        bt7.setOnClickListener(ListenerB7);
-        bt8.setOnClickListener(ListenerB8);
-        bt9.setOnClickListener(ListenerB9);
-        btsoma.setOnClickListener(ListenerBSoma);
-        btdivide.setOnClickListener(ListenerBDivide);
-        btsubtrai.setOnClickListener(ListenerBSubtrai);
-        btmultiplica.setOnClickListener(ListenerBMultiplica);
-        btresultado.setOnClickListener(ListenerBResultado);
-        btclear.setOnClickListener(ListenerBClear);
-
+                    if (res == (double) longResult) { //decimal
+                        tvresultado.setText(String.valueOf(longResult));
+                        tvexpressao.setText("");
+                    } else { //inteiro
+                        tvresultado.setText(String.valueOf(res));
+                        tvexpressao.setText("");
+                    }
+                } catch (Exception e) {
+                }
+            }
+        });
     }
 
-    void initVariaveis (){
-        bt0 = (Button) findViewById(R.id.bt0);
-        bt1 = (Button) findViewById(R.id.bt1);
-        bt2 = (Button) findViewById(R.id.bt2);
-        bt3 = (Button) findViewById(R.id.bt3);
-        bt4 = (Button) findViewById(R.id.bt4);
-        bt5 = (Button) findViewById(R.id.bt5);
-        bt6 = (Button) findViewById(R.id.bt6);
-        bt7 = (Button) findViewById(R.id.bt7);
-        bt8 = (Button) findViewById(R.id.bt8);
-        bt9 = (Button) findViewById(R.id.bt9);
+    void inicial (){
+        bt0 = findViewById(R.id.bt0);
+        bt1 = findViewById(R.id.bt1);
+        bt2 = findViewById(R.id.bt2);
+        bt3 = findViewById(R.id.bt3);
+        bt4 = findViewById(R.id.bt4);
+        bt5 = findViewById(R.id.bt5);
+        bt6 = findViewById(R.id.bt6);
+        bt7 = findViewById(R.id.bt7);
+        bt8 = findViewById(R.id.bt8);
+        bt9 = findViewById(R.id.bt9);
 
-        btsoma = (Button) findViewById(R.id.btsoma);
-        btdivide = (Button) findViewById(R.id.btdivide);
-        btsubtrai = (Button) findViewById(R.id.btsubtrai);
-        btmultiplica = (Button) findViewById(R.id.btmultiplica);
-        btresultado = (Button) findViewById(R.id.btresultado);
-        btclear = (Button) findViewById(R.id.btclear);
+        btsoma = findViewById(R.id.btsoma);
+        btdivide = findViewById(R.id.btdivide);
+        btsubtrai = findViewById(R.id.btsubtrai);
+        btmultiplica = findViewById(R.id.btmultiplica);
+        btresultado = findViewById(R.id.btresultado);
+        btclear = findViewById(R.id.btclear);
+        btponto = findViewById(R.id.btponto);
 
-        tvresultado = (TextView) findViewById(R.id.tvresultado);
-        tvnumeros = (TextView) findViewById(R.id.tvnumeros);
+        tvresultado = findViewById(R.id.tvresultado);
+        tvexpressao = findViewById(R.id.tvexpressao);
+        backspace = findViewById(R.id.btdelete);
     }
 
-    void NumeroPressionado (int btPressionado) {
-        if(op == ' '){
-            if (num1 == -1 && resultado == 0){
-                num1 = btPressionado;
-                tvnumeros.setText(Integer.toString(btPressionado));
-            } else {
-                num1 = num1 * 10 + btPressionado;
-                tvnumeros.append(Integer.toString(btPressionado));
+    public void addExpression(String valor, boolean ehNumero) {
+        if (ehNumero) { //numeros
+            tvresultado.setText("");
+            tvexpressao.append(valor);
+        } else { //operadores
+            if(!tvresultado.getText().toString().isEmpty()){ //continua a expressao a partir do resultado da anterior
+                tvexpressao.append(tvresultado.getText());
             }
-        } else {
-            if (num2 == -1){
-                num2 = btPressionado;
-                tvnumeros.append(Integer.toString(btPressionado));
-            } else{
-                num2 = num2 * 10 + btPressionado;
-                tvnumeros.append(Integer.toString(btPressionado));
-            }
+            tvexpressao.append(valor);
+            tvresultado.setText("");
         }
     }
 
-    void OperadorPressionado(String opPressionado) {
-        while (!semMaisNumeros) {
-            if (tvnumeros.getText().toString().equals(Integer.toString(resultado))) {
-                num1 = resultado;
-            }
-            if (num1 == -1) {
-                num1 = 0;
-            }
-
-            tvnumeros.append(opPressionado);
-            op = opPressionado.charAt(0);
-            semMaisNumeros = true;
+    @Override
+    public void onClick(View view) { //passa os valores clicados pra expressão
+        switch (view.getId()) {
+            case R.id.bt0:
+                addExpression("0",true);
+                break;
+            case R.id.bt1:
+                addExpression("1",true);
+                break;
+            case R.id.bt2:
+                addExpression("2",true);
+                break;
+            case R.id.bt3:
+                addExpression("3",true);
+                break;
+            case R.id.bt4:
+                addExpression("4",true);
+                break;
+            case R.id.bt5:
+                addExpression("5",true);
+                break;
+            case R.id.bt6:
+                addExpression("6",true);
+                break;
+            case R.id.bt7:
+                addExpression("7",true);
+                break;
+            case R.id.bt8:
+                addExpression("8",true);
+                break;
+            case R.id.bt9:
+                addExpression("9",true);
+                break;
+            case R.id.btponto:
+                addExpression(".",true);
+                break;
+            case R.id.btsoma:
+                addExpression("+",false);
+                break;
+            case R.id.btsubtrai:
+                addExpression("-",false);
+                break;
+            case R.id.btmultiplica:
+                addExpression("*",false);
+                break;
+            case R.id.btdivide:
+                addExpression("/",false);
+                break;
         }
-    }
-
-    void MostrarResultado() {
-        tvresultado.setText(Integer.toString(resultado));
-        tvnumeros.setText(Integer.toString(resultado));
-    }
-
-    void LimparTudo (){
-        num1 = -1;
-        num2 = -1;
-        resultado = 0;
-        tvresultado.setText("");
-        tvnumeros.setText("");
     }
 }
